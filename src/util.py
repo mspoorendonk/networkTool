@@ -14,6 +14,7 @@ import os
 import csv
 import subprocess
 import scapy.all
+import logging
 
 import ctypes.wintypes  # for "My Documents" folder
 
@@ -94,63 +95,57 @@ def get_own_ip():
     return ((([ip for ip in socket.gethostbyname_ex(socket.gethostname())[2] if not ip.startswith("127.")] or [[(s.connect(("8.8.8.8", 53)), s.getsockname()[0], s.close()) for s in [socket.socket(socket.AF_INET, socket.SOCK_DGRAM)]][0][1]]) + ["no IP found"])[0])
 
 
-def portscan(ip, port):
-      
+def portscan(ip, port, found_servers):
     with print_lock:
-        #print(ip)
         pass
     try:
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
             s.connect((ip, port))
             with print_lock:
-                print(ip, 'is open')
-                iperfServers.append(ip)
-
+                logging.debug('found iperf server %s' % ip)
+                found_servers.append(ip)
     except socket.timeout:
         with print_lock:
-           #print(ip, 'is closed')
-           pass
-
+            pass
     except Exception as ex:
         with print_lock:
-           print(ip, 'ERROR in portscan', ex)
+            print(ip, 'ERROR in portscan', ex)
 
 
 
-def worker():
+def worker(q, found_servers):
     while not q.empty():
         ip = q.get()
-        portscan(ip, iperfPort)
+        portscan(ip, iperfPort, found_servers)
         q.task_done()
 
 
 def findIperfServers():
     """ Scan the subnet to find servers that have port 5201 open. Completes in about 0.5 seconds."""
-    global iperfServers
-
+    logging.debug('finding iperf servers')
     socket.setdefaulttimeout(0.2)
 
-    iperfServers = []
+    found_servers = []
     net = get_own_ip()
     net1= net.split('.')
-    subnet = net1[0] + '.' + net1[1] + '.' + net1[2] + '.' 
+    subnet = net1[0] + '.' + net1[1] + '.' + net1[2] + '.'
 
     # fill the queue with work
+    q = Queue()
     for host in range(1, 254):
         q.put('%s%d' % (subnet, host))
 
     # spin up a bunch of threads that take work from the queue
-    # the threads will die when the queue is empty
     for x in range(255):
-        t = threading.Thread(target = worker)
+        t = threading.Thread(target=worker, args=(q, found_servers))
         t.daemon = True
         t.start()
-    
     q.join()
     msg = 'OK'
-    if len(iperfServers)==0:
+    if len(found_servers) == 0:
         msg = "Didn't find any iperf servers in subnet %s*. Start one on an other machine by choosing 'start iperf server' from the Windows Start menu." % subnet
-    return msg
+    logging.debug('found %d iperf servers' % len(found_servers))
+    return found_servers, msg
 
 
 def killAll(killName):

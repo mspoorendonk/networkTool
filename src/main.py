@@ -27,16 +27,25 @@ CHANGELOG:
 TODO:
 set a background image. use qml markup language for gui? or do a quick and dirty?
 
+
+
+
 PREREQUISITES:
-pip install PyQt6 numpy pyqtgraph psutil scapy
+activate the venv environment by running
+Set-ExecutionPolicy Unrestricted -Scope Process
+networkTool\\.venv\\Scripts\\Activate.ps1
+poetry install
+
+or without poetry:
+pip install PyQt6 numpy pyqtgraph psutil scapy wmi pytest
 
 PACKAGING:
 First package python with pyinstaller
-PS R:\project\networkTool> pyinstaller.exe --noconfirm 'networktool 3.spec'
+PS R:\\project\\networkTool> pyinstaller.exe --noconfirm 'networktool 3.spec'
 This will create a compiled version in "build" directory
 
 Then run innosetup script by doubleclicking the .iss file
-'C:\Program Files (x86)\Inno Setup 6\ISCC.exe' "inno setup script.iss"
+'C:\\Program Files (x86)\\Inno Setup 6\\ISCC.exe' "inno setup script.iss"
 This will create a package in "Output" directory
 
 INSTALLATION:
@@ -52,13 +61,14 @@ from PyQt6 import QtCore, uic #, QtMultimedia
 from numpy import true_divide
 import pyqtgraph as pg
 from pyqtgraph.Qt import QtCore, QtGui
-from tests import *
-from settings import SettingsDialog
-from about import AboutDialog
+from .networkTests import *
+from .settings import SettingsDialog
+from .about import AboutDialog
+from .help import HelpDialog
 from time import sleep
 #from socket import gethostname
 import logging
-from logger import QTextEditLogHandler
+from .logger import QTextEditLogHandler
 
 COMPANY_NAME = "spoorendonk.com"
 APPLICATION_NAME = "Network tool"
@@ -232,6 +242,7 @@ class MainWindow(QMainWindow):
         print(self.settings.fileName())
         self.settingsDialog = SettingsDialog(self, self.settings)
         self.aboutDialog = AboutDialog(self)
+        self.helpDialog = HelpDialog(self)
 
         print("Multithreading with maximum %d threads" % self.threadpool.maxThreadCount())
 
@@ -439,6 +450,10 @@ class MainWindow(QMainWindow):
         aboutAct = QAction('About', self)
         aboutAct.triggered.connect(self.aboutDialog.exec)
 
+        helpAct = QAction('Help', self)
+        helpAct.setShortcut('F1')
+        helpAct.triggered.connect(self.helpDialog.exec)
+
         devAct = QAction('Development test', self)
         devAct.setShortcut('Ctrl+T')
         devAct.triggered.connect(self.dev)
@@ -464,7 +479,7 @@ class MainWindow(QMainWindow):
 
         #menubar.addMenu("View")
         actionHelp = menubar.addMenu("Help")
-        #actionHelp.addAction(helpAct)
+        actionHelp.addAction(helpAct)
         actionHelp.addAction(aboutAct)
         actionHelp.addAction(devAct)
         return menubar
@@ -685,6 +700,7 @@ class MainWindow(QMainWindow):
 
 
     def startIperf(self, direction):
+        logging.debug('starting iperf %s' % direction)
         self.autoRangeTimer.start()
         if 'iperfDown' not in self.curves.keys() and direction in 'dba':
             self.curves['iperfDown'] = self.p2.plot(pen=pg.mkPen(color='#a0ffa0', width=2), fillLevel=0, brush=self.lightGreenBrush, name='LAN download')
@@ -716,6 +732,7 @@ class MainWindow(QMainWindow):
         print('update %s' % series.name)
         if series.name in self.curves.keys():
             self.curves[series.name].setData(series.timestamp, series.value, connect=np.array(series.connect))
+            self.autoRange(series.timestamp)
         self.lanStats.update(series)
 
     def clear(self):

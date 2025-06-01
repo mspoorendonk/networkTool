@@ -10,7 +10,7 @@ import subprocess
 import json
 from PyQt6.QtCore import *
 import numpy as np
-from util import *
+from .util import *
 import logging
 #import dateutil.parser  #pip install python-dateutil
 
@@ -92,7 +92,12 @@ class PingWorker(QRunnable):
         self.series.append(0, 1)
         while self.running:
             logging.debug("calling %s in folder '%s' " % (pingCmd, iperfDir))
-            process = subprocess.Popen(pingCmd, stdout=subprocess.PIPE, cwd=iperfDir, shell=True)
+            try:
+                process = subprocess.Popen(pingCmd, stdout=subprocess.PIPE, cwd=iperfDir, shell=True)
+            except Exception as e:
+                logging.error(f"Failed to start ping process: {e}")
+                self.signals.error.emit(f"Failed to start ping process: {e}")
+                break
             while process.poll() is None and self.running:
                 output = process.stdout.readline()
                 if output:
@@ -275,12 +280,12 @@ class IperfWorker(QRunnable):
         self.running = True
 
         if iperfServer == 'autodetect':
-            msg=findIperfServers()
-            if len(iperfServers) == 0:
+            found_servers, msg = findIperfServers()
+            if len(found_servers) == 0:
                 self.signals.error.emit(msg)
                 return
-            iperfCmd[2] = iperfServers[0]
-            self.signals.status.emit('selected iperf server %s' % iperfServers[0])
+            iperfCmd[2] = found_servers[0]
+            self.signals.status.emit('selected iperf server %s' % found_servers[0])
 
         count = 1
         if self.direction == 'a':

@@ -11,29 +11,44 @@ from PyQt6.QtCore import *
 class HelpDialog(QDialog):
 
     def __init__(self, parent):
-        super().__init__(parent, Qt.WindowCloseButtonHint)
+        super().__init__(parent)
 
-        self.setWindowTitle('About')
+        self.setWindowTitle('Help')
 
         self.buttonBox = QDialogButtonBox(self)
         self.buttonBox.setGeometry(QRect(150, 250, 341, 32))
-        self.buttonBox.setOrientation(Qt.Horizontal)
-        self.buttonBox.setStandardButtons(QDialogButtonBox.Ok)
         self.buttonBox.setObjectName("buttonBox")
 
+        help_text = (
+            "<b>Network Tool Help</b><br><br>"
+            "<b>Bandwidth</b> is the maximum rate of data transfer across a network, measured in megabits per second (Mbps). Higher bandwidth means more data can be sent or received per second.\n<br><br>"
+            "<b>Ping</b> measures the round-trip time for messages sent from your computer to another host and back, in milliseconds (ms). Lower ping means less delay and a more responsive connection.\n<br><br>"
+            "<b>LAN Bandwidth Test (iperf)</b>:<br>"
+            "To test your local network (LAN) speed, you need to run an <b>iperf server</b> on one machine in your network. This application will automatically search for the iperf server in your subnet.\n<br>"
+            "<ul>"
+            "<li>Download and run <b>iperf3</b> on another computer in your LAN.</li>"
+            "<li>Start the server with: <code>iperf3 -s</code></li>"
+            "<li>Then, use this tool to run the LAN bandwidth test.</li>"
+            "</ul>"
+            "If no server is found, make sure the firewall allows iperf3 and both computers are on the same subnet.\n<br><br>"
+            "<b>Internet Bandwidth Test (Ookla)</b>:<br>"
+            "This test uses the Ookla Speedtest CLI to measure your internet speed.\n<br><br>"
+            "For more information, see the documentation or contact the author."
+        )
+
         mainLayout = QVBoxLayout()
-        mainLayout.addWidget(QLabel(
-            "This program is written by Marc Spoorendonk, 2021. There was no tool available that showed\n"
-            + "the status of the network in one glance in a visually pleasing way. So I decided to\n"
-            + "write one as a hobbies project. It is a nice opportunity to get some PyQtChart\n"
-            + "experience along the way.\n\nLet me know if you like it or when you have some suggestions.\n"))
+        label = QLabel()
+        label.setTextFormat(Qt.TextFormat.RichText)
+        label.setText(help_text)
+        label.setWordWrap(True)
+        mainLayout.addWidget(label)
         mainLayout.addWidget(self.buttonBox)
         self.setLayout(mainLayout)
 
         self.buttonBox.accepted.connect(self.accept)
 
         self.activateWindow()
-        # self.resize(400, 700)
+        # self.resize(500, 700)
 
     def accept(self):
         print('accept')
