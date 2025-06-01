@@ -1,4 +1,4 @@
-from util import *
+from src.util import *
 import re
 
 
@@ -22,13 +22,13 @@ def test_getFirstHop():
 
 def test_findIperfServers():
     findIperfServers()
-    #print(iperfServers)
+    print(iperfServers)
     assert len(iperfServers)>=0
 
 
 def test_listProcesses():
     procs=listProcesses()
-    #print(procs)
+    print(procs)
     #self.assertTrue(len(procs)>1, 'no processes returned')
     assert True     
 
