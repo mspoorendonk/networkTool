@@ -273,7 +273,7 @@ class Series():
             os.makedirs(exportFolder)
 
         fileName = os.path.join(exportFolder, self.name+'.csv')
-        print('exporting to ' + fileName)
+        logging.info('exporting to ' + fileName)
 
         try:
             with open(fileName, mode='w', newline='') as csv_file:  # setting newline to '' disables newline translation so that all csvs are equal on all platforms
@@ -284,8 +284,7 @@ class Series():
                     time_string = time.ctime(self.timestamp[i])
                     writer.writerow([time_string, self.value[i], self.connect[i]])
         except IOError:
-            print('Failed to open %s for export' % fileName)
-            # todo: make this a popup and repeat the errormessage
+            logging.error('Failed to open %s for export' % fileName)
 
     def __len__(self):
         return len(self.timestamp)

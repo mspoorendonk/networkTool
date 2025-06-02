@@ -61,14 +61,14 @@ from PyQt6 import QtCore, uic #, QtMultimedia
 from numpy import true_divide
 import pyqtgraph as pg
 from pyqtgraph.Qt import QtCore, QtGui
-from .networkTests import *
-from .settings import SettingsDialog
-from .about import AboutDialog
-from .help import HelpDialog
+from networkTests import *
+from settings import SettingsDialog
+from about import AboutDialog
+from help import HelpDialog
 from time import sleep
 #from socket import gethostname
 import logging
-from .logger import QTextEditLogHandler
+from logger import QTextEditLogHandler
 
 COMPANY_NAME = "spoorendonk.com"
 APPLICATION_NAME = "Network tool"

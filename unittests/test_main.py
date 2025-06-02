@@ -5,6 +5,7 @@ import pytest
 from src.main import MainWindow, QApplication
 import os
 import logging
+from pathlib import Path
 
 #dataStore = 0
 
@@ -92,8 +93,33 @@ def test_start_iperf_alternating(main_window):
 
 def test_clear(main_window):
     main_window.clear()
-    # Optionally add assertions here
+    # Assert all series are empty
+    for name, series in main_window.dataStore.data.items():
+        assert len(series.value) == 0
+        assert len(series.timestamp) == 0
+        assert len(series.connect) == 0
+        assert len(series.comment) == 0
+        assert len(series.commentTimestamp) == 0
+    # Assert stats labels are reset
+    for stats in (main_window.lanStats, main_window.internetStats):
+        for label in (
+            stats.maxDownLabel, stats.avgDownLabel, stats.minDownLabel, stats.curDownLabel,
+            stats.maxUpLabel, stats.avgUpLabel, stats.minUpLabel, stats.curUpLabel
+        ):
+            assert label.text() == '-'
+    # Assert status bar message
+    assert main_window.statusBar().currentMessage() == 'Data cleared'
 
-def test_export(main_window):
-    main_window.export()
-    # Optionally add assertions here
+def test_export(main_window, tmp_path):
+    # Patch getMyDocuments to use a temp directory
+    import src.util as util
+    orig_getMyDocuments = util.getMyDocuments
+    util.getMyDocuments = lambda: str(tmp_path)
+    try:
+        main_window.export()
+        # Check that a CSV file was created for each series
+        for name in main_window.dataStore.data.keys():
+            csv_file = tmp_path / f'Networktool/{name}.csv'
+            assert csv_file.exists(), f"{csv_file} does not exist"
+    finally:
+        util.getMyDocuments = orig_getMyDocuments

@@ -10,7 +10,7 @@ import subprocess
 import json
 from PyQt6.QtCore import *
 import numpy as np
-from .util import *
+from util import *
 import logging
 #import dateutil.parser  #pip install python-dateutil
 
