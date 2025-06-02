@@ -4,15 +4,15 @@ block_cipher = None
 
 # if you really want to figure out every lib that is needed then follow this: https://blog.csdn.net/qq_41730930/article/details/112612864
 
-a = Analysis(['main.py', 'tests.py', 'util.py'],
-             pathex=['R:\\project\\networkTool'],
+a = Analysis(['src/main.py', 'src/networkTests.py', 'src/util.py'],
+             pathex=[r'C:\Users\marc_\OneDrive\GitWorkingFolder\networkTool'],
              binaries=[],
              datas=[('iperf/*', 'iperf'),
 			 ('ookla/*', 'ookla'),
 			 ('resources/*', 'resources'),
-             (r'C:\Users\marc_\AppData\Local\Programs\Python\Python39\Lib\site-packages\PyQt6\Qt6\plugins\platforms', 'platforms'),  # required because pyinstaller doesn't recognize pyqt6 yet. https://stackoverflow.com/questions/66286229/create-pyqt6-python-project-executable
-             (r'C:\Users\marc_\AppData\Local\Programs\Python\Python39\Lib\site-packages\PyQt6\sip.cp39-win_amd64.pyd', 'PyQt6/sip.pyd'), # https://github.com/pyinstaller/pyinstaller/issues/5414
-             (r'C:\Users\marc_\AppData\Local\Programs\Python\Python39\Lib\site-packages\PyQt6\Qt6', 'PyQt6/Qt6') # https://github.com/pyinstaller/pyinstaller/issues/5414
+           #  (r'C:\Users\marc_\AppData\Local\Programs\Python\Python39\Lib\site-packages\PyQt6\Qt6\plugins\platforms', 'platforms'),  # required because pyinstaller doesn't recognize pyqt6 yet. https://stackoverflow.com/questions/66286229/create-pyqt6-python-project-executable
+           #  (r'C:\Users\marc_\AppData\Local\Programs\Python\Python39\Lib\site-packages\PyQt6\sip.cp39-win_amd64.pyd', 'PyQt6/sip.pyd'), # https://github.com/pyinstaller/pyinstaller/issues/5414
+           #  (r'C:\Users\marc_\AppData\Local\Programs\Python\Python39\Lib\site-packages\PyQt6\Qt6', 'PyQt6/Qt6') # https://github.com/pyinstaller/pyinstaller/issues/5414
              ],
              hiddenimports=["PyQt6.sip"], # https://github.com/pyinstaller/pyinstaller/issues/5414
              hookspath=[],
