@@ -249,7 +249,13 @@ class Series():
         self.comment = []
         self.commentTimestamp = []
 
-    def append(self, value, connect=True):
+    def append(self, value, connect=1):
+        """Append a new value to the time series.
+        
+        Args:
+            value: The measurement value to append
+            connect: Should the dots be connected with a line (1=connected, 0=disconnected).
+        """
         self.timestamp.append(timestamp())
         self.value.append(value)
         self.connect.append(connect)
