@@ -133,7 +133,8 @@ def findIperfServers():
     # fill the queue with work
     q = Queue()
     for host in range(1, 254):
-        q.put('%s%d' % (subnet, host))
+        if host != int(net1[3]): # skip own ip
+            q.put('%s%d' % (subnet, host))
 
     # spin up a bunch of threads that take work from the queue
     for x in range(255):
