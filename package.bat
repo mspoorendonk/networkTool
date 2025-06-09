@@ -21,11 +21,31 @@ REM   - Requires PyInstaller and Inno Setup (will auto-install Inno Setup if mis
 REM =====================================================================================
 setlocal
 
+
+
+
+@echo off
+set "GOOGLE_DRIVE_PATH="
+
+REM Loop through all possible drive letters
+for %%d in (C D E F G H I J K L M N O P Q R S T U V W X Y Z) do (
+    if exist "%%d:\My Drive\" (
+        set "GOOGLE_DRIVE_PATH=%%d:\My Drive"
+        goto :found_drive
+    )
+)
+
+echo Google Drive "My Drive" folder not found on any drive letter.
+exit /b 1
+
+:found_drive
+
 REM === Configuration ===
 set "INNO_URL=https://jrsoftware.org/download.php/is.exe"
 set "INNO_INSTALLER=%TEMP%\inno_setup_installer.exe"
 set "INNO_DEFAULT_PATH=C:\Program Files (x86)\Inno Setup 6\ISCC.exe"
-set "OUTPUT_FOLDER=G:\My Drive\Project\networkTool\Output"
+set "OUTPUT_FOLDER=%GOOGLE_DRIVE_PATH%\Project\networkTool\Output"
+
 
 REM === Check if ISCC.exe is in PATH or default location ===
 where ISCC.exe >nul 2>nul
@@ -70,6 +90,7 @@ echo "====================================== creating installer ================
 echo "======================================= copying to output folder =============================================="
 if exist "%OUTPUT_FOLDER%" (
     copy /Y "Output\Networktool setup.exe" "%OUTPUT_FOLDER%"
+    echo "copied Networktool setup.exe to %OUTPUT_FOLDER%"
 ) else (
     echo Destination folder "%OUTPUT_FOLDER%" does not exist. Please create it or update the path in package.bat.
 )
