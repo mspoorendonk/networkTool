@@ -13,7 +13,8 @@ dependencies = [
     "pyqtgraph (>=0.13.7,<0.14.0)",
     "psutil (>=7.0.0,<8.0.0)",
     "wmi (>=1.5.1,<2.0.0)",
-    "pyinstaller (>=6.13.0,<7.0.0)"
+    "pyinstaller (>=6.13.0,<7.0.0)",
+    "setuptools (>=80.9.0,<81.0.0)"
 ]
 
 [tool.poetry]
