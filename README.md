@@ -38,7 +38,8 @@ Network Tool is a comprehensive application designed to measure network speed an
 
 4. **Create Windows Installer** (Optional):
    run the 
-   ```package.bat
+   ```sh
+   package.bat
    ```
 
 ### Usage
