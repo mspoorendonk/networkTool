@@ -27,7 +27,7 @@ setlocal
 @echo off
 set "GOOGLE_DRIVE_PATH="
 
-REM Loop through all possible drive letters
+REM Loop through all possible drive letters to find Google Drive letter
 for %%d in (C D E F G H I J K L M N O P Q R S T U V W X Y Z) do (
     if exist "%%d:\My Drive\" (
         set "GOOGLE_DRIVE_PATH=%%d:\My Drive"
@@ -93,6 +93,7 @@ if exist "%OUTPUT_FOLDER%" (
     echo "copied Networktool setup.exe to %OUTPUT_FOLDER%"
 ) else (
     echo Destination folder "%OUTPUT_FOLDER%" does not exist. Please create it or update the path in package.bat.
+    exit /b 1
 )
 echo "============================================= done =============================================="
 echo Packaging complete.
