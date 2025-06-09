@@ -21,16 +21,16 @@ def test_getFirstHop():
 
 
 def test_findIperfServers():
-    findIperfServers()
+    iperfServers, msg = findIperfServers()
     print(iperfServers)
+    print(msg)
     assert len(iperfServers)>=0
 
 
 def test_listProcesses():
     procs=listProcesses()
     print(procs)
-    #self.assertTrue(len(procs)>1, 'no processes returned')
-    assert True     
+    assert len(procs)>1, 'no processes returned'
 
 
 def test_getSSID():

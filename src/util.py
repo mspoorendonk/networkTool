@@ -178,12 +178,13 @@ def listProcesses():
             exe = p.exe()
             pid = p.pid
             print(name)
-            #ls.append((name, exe, pid))
+            ls.append((name, exe, pid))
         except (psutil.AccessDenied, psutil.ZombieProcess):
             continue
         except psutil.NoSuchProcess:
             continue
     #print(ls) 
+    return ls
 
 def getSSID():
     #print('lookingup ssid')
@@ -272,9 +273,8 @@ class Series():
         del self.comment[:]
         del self.commentTimestamp[:]
 
-    def writeCsv(self):
+    def writeCsv(self, exportFolder):
         #exportFolder = os.path.expanduser('~/Networktool')
-        exportFolder = os.path.join(getMyDocuments(), 'Networktool')
 
         if not os.path.exists(exportFolder):
             os.makedirs(exportFolder)
@@ -318,7 +318,7 @@ class DataStore():
     def createSeries(self, name):
         self.data[name] = Series(name)
 
-    def export(self):
+    def export(self, exportFolder):
         for name, series in self.data.items():
-            series.writeCsv()
+            series.writeCsv(exportFolder)
 

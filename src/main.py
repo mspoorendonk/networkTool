@@ -758,7 +758,7 @@ class MainWindow(QMainWindow):
         self.showStatus('Data cleared')
 
     def export(self):
-        self.dataStore.export()
+        self.dataStore.export(os.path.join(getMyDocuments(), 'Networktool'))
 
 
 

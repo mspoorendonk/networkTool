@@ -5,7 +5,8 @@
 		}
 	],
 	"settings": {
-		"python.pythonPath": "C:\\Users\\marc_\\AppData\\Local\\Programs\\Python\\Python39\\python.exe"
+		"python.pythonPath": "C:\\Users\\marc_\\AppData\\Local\\Programs\\Python\\Python39\\python.exe",
+		"CodeGPT.apiKey": "CodeGPT Plus Beta"
 	},
 	"launch": {
 		"version": "0.2.0",

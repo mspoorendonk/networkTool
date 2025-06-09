@@ -123,7 +123,10 @@ class PingWorker(QRunnable):
 
         self.series.append(0, 1)
         self.series.append(np.nan, 0)
-        killAll('ping.exe')  # kill it or it will keep running otherwise
+        
+        #killAll('ping.exe')  # kill it or it will keep running otherwise
+        #process.terminate() 
+        os.kill(process.pid, 9)
 
         print('returning ping')
         self.signals.status.emit('ping done')
@@ -207,7 +210,8 @@ Performs an Ookla bandwidth test.
 
             #rc = process.poll()
 
-            killAll('speedtest.exe')  # kill it or it will keep running otherwise
+            #process.terminate()  # kill it or it will keep running otherwise
+            os.kill(process.pid, 9)
 
             print('returning ookla')
 
@@ -355,13 +359,15 @@ class IperfWorker(QRunnable):
             self.signals.update.emit(self.seriesDown)
             self.signals.update.emit(self.seriesUp)
 
-            killAll('iperf3.exe')  # kill it or it will keep running otherwise
+            #process.terminate()  # kill it or it will keep running otherwise
+            if process.pid:
+                os.kill(process.pid, 9)
 
             rc = process.poll()
             print('returning iperf', rc)
 
             if self.running:  # if we intend to stop anyway then reading errors is not interesting
-                err = process.stderr.read()  # this seems blocking, which is annoying when no data is there to read.
+                err = process.stderr.read1()  # non-blocking read
                 if err:
                     err = err.decode('utf-8').strip()
                     print('>>', err, '<<')
