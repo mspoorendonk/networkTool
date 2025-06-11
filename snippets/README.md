@@ -1,0 +1,1 @@
+This folder contains some tryouts. For charting, audio, networking , and other things. It's not directly included in the main project, just some experiments.

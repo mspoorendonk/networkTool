@@ -2,6 +2,7 @@
 __pycache__
 build
 dist
+Output
 *.pyc
 *.pyo
 *.pyd
@@ -10,3 +11,5 @@ dist
 *.pywz
 .venv
 .continue
+.idea
+.vscode
