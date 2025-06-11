@@ -12,6 +12,13 @@ Network Tool is a comprehensive application designed to measure network speed an
 - **Background Polling**: Monitors network interfaces and SSID changes in the background.
 - **Data Export**: Allows exporting network statistics to CSV files.
 
+
+<img src="resources/doc/networktool_ping.gif" />
+<i>Measure ping latency to first hop and to google Meet video server</i>
+
+<img src="resources/doc/networktool_ookla_alternating.gif" />
+<i>Measure alternating up/download from Ookla</i>
+
 ### Installation
 
 #### Prerequisites
