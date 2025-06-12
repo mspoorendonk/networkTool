@@ -3,7 +3,7 @@
 
 #define MyAppName "Networktool"
 ; increment this every time you do a release:
-#define MyAppVersion "1.5"
+#define MyAppVersion "1.1.0"
 #define MyAppPublisher "Marc Spoorendonk"
 #define MyAppExeName "networktool.exe"
 

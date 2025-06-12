@@ -22,6 +22,11 @@ Network Tool is an application designed to measure network speed and performance
 - **Data Export**: Allows exporting the network statistics to CSV files.
 - **Audible status**: A tone can be played to help the user sense the networks state without looking at the screen. The frequency of the tone indicates the state. This allows the user to walk around with the laptop to find dead spots or to tweak the network settings without having to constantly check the screen.
 
+minor features:
+- Mouse zoom and pan on the charts.
+- Autoranging on the charts
+- Linked time axes between the latency and bandwith charts
+- Numerical statistics with min, avg, max
 
 <img src="doc/resources/networktool_ping.gif" /><br/><i>Measure ping latency to first hop and to Google Meet video server</i><br/>
 
@@ -33,6 +38,8 @@ Network Tool is an application designed to measure network speed and performance
 
 ### Installation
 Download the networktool.exe file from the releases page and run it. The installer creates startmenu entries.
+
+<img src="doc/resources/installer.png"><br/><i>Installer dialog</i><br/>
 
 ### Running NetworkTool
 

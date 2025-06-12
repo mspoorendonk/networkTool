@@ -47,6 +47,15 @@ Thank you for your interest in contributing to Network Tool! We welcome contribu
    poetry run pytest
    ```
 
+## Releasing
+- Thoroughly test and ensure all tests complete succesfully
+- Update the version number in inno setup script.iss to a new version: #define MyAppVersion "1.1.0" 
+- Build an installer by running the package.bat
+- Test the installer by running it
+- Push all changes to main
+- Tag the codebase in github with that same version number.
+- Create a new release on github with the tag and a description of the changes and upload the installe
+
 ## License
 
 By contributing to Network Tool, you agree that your contributions will be licensed under the GNU General Public License version 3. See the `LICENSE` file for more details.
