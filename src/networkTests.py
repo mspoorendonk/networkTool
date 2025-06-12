@@ -14,10 +14,7 @@ from util import *
 import logging
 #import dateutil.parser  #pip install python-dateutil
 
-#serverIp = '192.168.1.112'
-#serverIp = '169.254.147.208'
 #serverIp = 'ping.online.net'
-#serverIp = 'www.ellipz.io'
 serverIp = 'lens.l.google.com'
 
 # download iperf3.9 from https://files.budman.pw/iperf3.9_64.zip this version has the requried flushing of output buffer
@@ -68,7 +65,7 @@ class PingWorker(QRunnable):
 
     """
 
-    def __init__(self, series, lossSeries, host):
+    def __init__(self, series, lossSeries, host, pingSize):
         super(PingWorker, self).__init__()
 
         self.signals = WorkerSignals()
@@ -76,6 +73,7 @@ class PingWorker(QRunnable):
         self.series = series
         self.lossSeries = lossSeries
         self.host = host
+        self.pingSize = pingSize
 
     def stop(self):
         print('STOP requested')
@@ -86,8 +84,7 @@ class PingWorker(QRunnable):
         threading.current_thread().name = "ping"  # makes it easy to locate the thread in the debugger
         self.running = True
 
-        # TODO: get the length from the settings
-        pingCmd = ['ping', '-l', '1024', '-w', '3000', '-n', '5', self.host ]  # report a packetloss every 5 seconds
+        pingCmd = ['ping', '-l', self.pingSize, '-w', '3000', '-n', '5', self.host ]  # report a packetloss every 5 seconds
         self.series.append(np.nan, 0)
         self.series.append(0, 1)
         while self.running:
@@ -200,8 +197,8 @@ Performs an Ookla bandwidth test.
                             cu = 1
 
             if state == 'down':  # only happens when stopping the run
-                self.seriesDown.append(0, 1)
-                self.seriesDown.append(np.nan, 0)
+                self.seriesDown.append(0, 1)        # close the series
+                self.seriesDown.append(np.nan, 0)   # and add a nan to start a gap
                 self.signals.update.emit(self.seriesDown)
             if state == 'up':
                 self.seriesUp.append(0, 1)
@@ -210,8 +207,8 @@ Performs an Ookla bandwidth test.
 
             #rc = process.poll()
 
-            #process.terminate()  # kill it or it will keep running otherwise
-            os.kill(process.pid, 9)
+            process.terminate()  # kill it or it will keep running otherwise
+            #os.kill(process.pid, 9) # PermissionError: [WinError 5] Access is denied
 
             print('returning ookla')
 

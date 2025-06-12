@@ -37,6 +37,7 @@ Thank you for your interest in contributing to Network Tool! We welcome contribu
 - Use meaningful variable and function names.
 - Write clear and concise docstrings for all functions and classes.
 - Ensure that your code is well-documented and easy to understand.
+- Although this is currently only tested on windows, try to make it as cross-platform as possible, such that in the future it can also be used on linux.
 
 ## Testing
 
@@ -52,4 +53,4 @@ By contributing to Network Tool, you agree that your contributions will be licen
 
 ## Contact
 
-If you have any questions or need further assistance, please contact [Marc Spoorendonk](mailto:marc@spoorendonk.com).
+If you have any questions or need further assistance, please use github issues

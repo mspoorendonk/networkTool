@@ -23,6 +23,8 @@ CHANGELOG:
            Upgraded to PyQt6
            Removed pyqtchart brush workaround as my bugreport is now fixed in the release
            Fixed iperfserver autodetect
+2025-06-12 Added sound effect for slow pings (disabled for now)
+2025-06-12 Added a tone for the network speed
 
 TODO:
 set a background image. use qml markup language for gui? or do a quick and dirty?
@@ -69,9 +71,11 @@ from time import sleep
 #from socket import gethostname
 import logging
 from logger import QTextEditLogHandler
+import sounddevice as sd
+import math
 
 COMPANY_NAME = "spoorendonk.com"
-APPLICATION_NAME = "Network tool"
+APPLICATION_NAME = "NetworkTool"
 
 print('python version', sys.version)
 print('pyqtgraph version', pg.__version__)
@@ -233,6 +237,14 @@ class MainWindow(QMainWindow):
 
         self.show()
 
+        # for playing a tone
+        self.phase = 0
+        self.sample_rate = 44100
+        self.frequency = 500 # default frequency Hz
+        self.is_playing = False
+        self.stream = None
+        self.startAudio()
+
         self.dataStore = DataStore()
 
         self.threadpool = QThreadPool()
@@ -309,6 +321,54 @@ class MainWindow(QMainWindow):
         self.autoRangeTimer.setInterval(50)          # Throw event timeout with an interval in ms
         self.autoRangeTimer.timeout.connect(self.autoRange2) # each time timer counts a second, call self.blink
         self.stop.connect(self.autoRangeTimer.stop) # stop the autoranging of the charts when pressing ESC
+
+        self.stop.connect(self.stopTone)
+
+    def audio_callback(self, outdata, frames, time, status):
+        """Generate continuous sine wave with phase continuity"""
+        if status:  # Check for errors
+            print(status, file=sys.stderr)
+            logging.warning(f"Audio callback status: {status}")
+        
+        if not self.is_playing:
+            outdata.fill(0)  # Output silence when not playing
+            return
+            
+        for i in range(frames):
+            outdata[i] = 0.3 * math.sin(self.phase)
+            # Increment phase based on current frequency
+            self.phase += 2 * math.pi * self.frequency / self.sample_rate
+            # Keep phase in reasonable range to prevent overflow
+            if self.phase > 2 * math.pi:
+                self.phase -= 2 * math.pi
+            
+    def startAudio(self):
+        """Start continuous audio stream"""
+        self.stream = sd.OutputStream(
+            callback=self.audio_callback,
+            channels=1,
+            samplerate=self.sample_rate,
+            dtype='float32'
+        )
+        self.stream.start()
+        print('Started audio stream')
+
+    def stopTone(self):
+        print('Stopping tone')
+        self.is_playing = False
+        
+    def playTone(self, series):
+        """Play a tone based on the series value. If the value is nan, stop the tone."""
+        value = series.value[-1]
+        if np.isnan(value):
+            self.is_playing = False
+        elif value > 0:
+            if series.name.startswith('ping'):
+                self.frequency = mapNetworkStateToTone(value, int(self.settings.value('max_latency')), 0)
+            else:
+                self.frequency = mapNetworkStateToTone(value, 0, int(self.settings.value('max_bandwidth')))
+            self.is_playing = True
+            print(f'Playing tone with frequency: {self.frequency}')
 
     def setupCharts(self):
         # the linking of the xaxes in combination with autoranging gave very flickery graphics.
@@ -559,6 +619,7 @@ class MainWindow(QMainWindow):
     def closeEvent(self, event):
         self.settings.setValue("size", self.size())
         self.settings.setValue("pos", self.pos())
+        #self.stream.stop() # stop the audio stream
         event.accept()
         print('Closing main window. Settings are stored.')
 
@@ -614,7 +675,7 @@ class MainWindow(QMainWindow):
         #else:
         #    self.curves[name].setData(name=name + ' ' + host) # this does not work (bug in pyqtgraph) https://github.com/pyqtgraph/pyqtgraph/issues/1000
         logging.debug('Starting ping for '+name)
-        worker = PingWorker(self.dataStore.data[name], self.dataStore.data[lossName], host)
+        worker = PingWorker(self.dataStore.data[name], self.dataStore.data[lossName], host, self.settings.value('ping_size'))
         worker.signals.error.connect(self.showError)
         worker.signals.update.connect(self.updatePing)
         worker.signals.status.connect(self.showStatus)
@@ -646,7 +707,12 @@ class MainWindow(QMainWindow):
         if series.name in self.curves.keys():
             self.curves[series.name].setData(series.timestamp, series.value, connect=np.array(series.connect))
             self.autoRange(series.timestamp)
+            if self.settings.value('tone_series') == series.name:
+                self.playTone(series)
 
+        # this is a sound effect for slow pings. It's disabled for now.
+        # TODO: make this a setting
+        # TODO: make it run non-blocking
         if len(series) > 0:
             # if latency > 200ms
             ms = series.value[-1]  # get last value
@@ -665,6 +731,8 @@ class MainWindow(QMainWindow):
                     #player.setVolume(50)
                     #player.play()
                     #sleep(2)  # that is nasty but seems required. We should play in a separate thread.
+
+
 
     def dev(self):
         #self.curves['pingFirstHop'].setPos(timestamp(), 0)
@@ -689,12 +757,21 @@ class MainWindow(QMainWindow):
         self.threadpool.start(worker)
 
 
+    
+
+
+
+
+
     def updateOokla(self, series):
         
         if series.name in self.curves.keys():
             self.curves[series.name].setData(series.timestamp, series.value, connect=np.array(series.connect))
             #logging.debug('update %s' % series.name)
             self.autoRange(series.timestamp)
+            # play tone if the series is the one that is set in the settings
+            if self.settings.value('tone_series') == series.name:
+                self.playTone(series)
         self.internetStats.update(series)
 
 
@@ -733,6 +810,8 @@ class MainWindow(QMainWindow):
         if series.name in self.curves.keys():
             self.curves[series.name].setData(series.timestamp, series.value, connect=np.array(series.connect))
             self.autoRange(series.timestamp)
+            if self.settings.value('tone_series') == series.name:
+                self.playTone(series)
         self.lanStats.update(series)
 
     def clear(self):

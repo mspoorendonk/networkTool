@@ -15,6 +15,8 @@ import csv
 import subprocess
 import scapy.all
 import logging
+import numpy as np
+
 
 import ctypes.wintypes  # for "My Documents" folder
 
@@ -23,6 +25,21 @@ iperfPort = 5201
 iperfServers = []
 q = Queue()
 print_lock = threading.Lock()  # this makes sure that messages are printed as a whole to the screen and not halfway interrupted by different thread.
+
+def mapNetworkStateToTone(networkState, minState, maxState, minFreq=200, maxFreq=1000):
+    # map the network state to a tone
+    # the tone will be high when the bandwidth is high or the latency is low
+    # the tone will be low when the bandwidth is low or the latency is high
+    # the tone will be a sine wave with a frequency between 10 and 20
+    # the volume will be 0.01
+    
+    if np.isnan(networkState):
+        return 0
+    if minState == maxState:
+        return maxFreq
+    freq = minFreq + (maxFreq - minFreq) * (networkState - minState) / (maxState - minState)
+    freq = max(min(freq, maxFreq), minFreq)
+    return freq
 
 
 
